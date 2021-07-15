@@ -156,8 +156,18 @@ class MainApp(tk.Tk):
         self.type.trace('w', self.update_axes)
 
         self.x_axis.trace('w', self.update_axes)
+        self.x_axis.trace('w', self.set_xlabel)
+        self.x_axis.trace('w', self.update_titles)
         self.y_axis.trace('w', self.update_axes)
+        self.y_axis.trace('w', self.set_ylabel)
+        self.y_axis.trace('w', self.update_titles)
 
+
+    def set_xlabel(self, *args):
+        self.x_title.set(self.x_axis.get())
+
+    def set_ylabel(self, *args):
+        self.y_title.set(self.y_axis.get())
 
     def update_titles(self, *args):
         plt.title(self.title1.get())
