@@ -48,54 +48,51 @@ class MainApp(tk.Tk):
         self.data_on_plot = False
 
         # creates frames
+        self.plotting_frame = tk.Frame()
+        self.plotting_frame.grid(row=0, column=1,rowspan="2", sticky="news")
         self.left_frame = tk.Frame()
-        self.left_frame.grid(row=0, column=1,sticky="news")
-        self.analysis_frame = tk.Frame()
-        self.analysis_frame.grid(row=0, column=0,sticky="news")
+        self.left_frame.grid(row=0, column=0,sticky="news")
         self.right_frame = tk.Frame()
         self.right_frame.grid(row=0, column=2, sticky="news")
 
         # sets up plotting frame
         self.fig, self.ax = plt.subplots(1,figsize=[8,6])
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self.left_frame)
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self.plotting_frame)
         self.canvas.draw()
         self.ax.clear()
         self.canvas.get_tk_widget().pack(expand=1, fill=tk.BOTH)
-        self.toolbar = NavigationToolbar2Tk(self.canvas, self.left_frame)
+        self.toolbar = NavigationToolbar2Tk(self.canvas, self.plotting_frame)
         self.toolbar.update()
 
         # label for directions
-        ttk.Label(self.analysis_frame, text="Choose which data to plot:", anchor="center").grid(row=0,column=0)
+        ttk.Label(self.left_frame, text="Choose which data to plot:", anchor="center").grid(row=0,column=0)
         # buttons to choose data to plot
     ### Left Frame ###
-        self.matbtn = ttk.Button(self.analysis_frame,text="Load data file",command=self.new_file)
+        self.matbtn = ttk.Button(self.left_frame,text="Load data file",command=self.new_file)
         self.matbtn.grid(row=3, column=0,sticky="ew")
-        self.clearbtn = ttk.Button(self.analysis_frame, text="Clear plot", command=self.clear)
+        self.clearbtn = ttk.Button(self.left_frame, text="Clear plot", command=self.clear)
         self.clearbtn.grid(row=20, column=0, sticky="ew")
-        self.savebtn = ttk.Button(self.analysis_frame, text="Save", command=self.save_window)
+        self.savebtn = ttk.Button(self.left_frame, text="Save", command=self.save_window)
         self.savebtn.grid(row=21, column=0, sticky="ew")
 
     ### Right Frame ###
+
         # Plot title
-        ttk.Label(self.right_frame, text="Title:", anchor="e").grid(row=0, column=0, sticky="ew")
+        ttk.Label(self.right_frame, text="Title:", anchor="e").grid(row=2, column=0, sticky="ew")
         self.title1 = tk.StringVar()
         self.title1.set("Untitled")
-        ttk.Entry(self.right_frame, textvariable=self.title1, width=30).grid(row=0, column=1, sticky="ew", columnspan=2)
+        ttk.Entry(self.right_frame, textvariable=self.title1, width=30).grid(row=2, column=1, sticky="ew", columnspan=2)
         self.title1.trace('w',self.update_titles)
 
         # X axis
-        ttk.Label(self.right_frame, text="x-axis:", anchor="c").grid(row=10, column=0, columnspan=3, sticky="ew")
-        ttk.Label(self.right_frame, text="Data:", anchor="e").grid(row=11, column=0, sticky="ew")
-        ttk.Label(self.right_frame, text="Name:", anchor="e").grid(row=12, column=0, sticky="ew")
+        ttk.Label(self.right_frame, text="X-Axis Label:", anchor="e").grid(row=8, column=0, sticky="ew")
         self.x_title = tk.StringVar()
         self.x_title.set("")
-        ttk.Entry(self.right_frame, textvariable=self.x_title, width=30).grid(row=12, column=1, sticky="ew", columnspan=2)
+        ttk.Entry(self.right_frame, textvariable=self.x_title, width=30).grid(row=8, column=1, sticky="ew", columnspan=2)
         self.x_title.trace('w',self.update_titles)
 
         # Y axis
-        ttk.Label(self.right_frame, text="y-axis:", anchor="c").grid(row=5, column=0, columnspan=3,sticky="ew")
-        ttk.Label(self.right_frame, text="Data:", anchor="e").grid(row=6, column=0, sticky="ew")
-        ttk.Label(self.right_frame, text="Name:", anchor="e").grid(row=7, column=0, sticky="ew")
+        ttk.Label(self.right_frame, text="Y-Axis Label:", anchor="e").grid(row=7, column=0, sticky="ew")
         self.y_title = tk.StringVar()
         self.y_title.set("")
         ttk.Entry(self.right_frame, textvariable=self.y_title, width=30).grid(row=7, column=1, sticky="ew", columnspan=2)
@@ -112,40 +109,15 @@ class MainApp(tk.Tk):
         ttk.Entry(self.right_frame, textvariable=self.xup, width=5).grid(row=13, column=2, sticky="ew")
         self.xup.trace('w',self.update_lims)
 
-        ttk.Label(self.right_frame, text="y lims:", anchor="e").grid(row=8, column=0, sticky="ew")
+        ttk.Label(self.right_frame, text="y lims:", anchor="e").grid(row=12, column=0, sticky="ew")
         self.ylow = tk.StringVar()
         self.yup = tk.StringVar()
         self.ylow.set(0)
         self.yup.set(100)
-        ttk.Entry(self.right_frame, textvariable=self.ylow, width=5).grid(row=8, column=1, sticky="ew")
+        ttk.Entry(self.right_frame, textvariable=self.ylow, width=5).grid(row=12, column=1, sticky="ew")
         self.ylow.trace('w',self.update_lims)
-        ttk.Entry(self.right_frame, textvariable=self.yup, width=5).grid(row=8, column=2, sticky="ew")
+        ttk.Entry(self.right_frame, textvariable=self.yup, width=5).grid(row=12, column=2, sticky="ew")
         self.yup.trace('w',self.update_lims)
-
-
-        self.update_titles()
-        self.update_lims()
-    def new_file(self):
-        directory = filedialog.askopenfile(initialdir=os.path.expanduser('~/Desktop/CPMI/Lithium_Wetting/GF-Wetting/304SS'))
-        self.data = pd.read_csv(directory)
-        self.add_axes()
-
-    def add_axes(self):
-        # choose axes
-        columns = []
-        for col in self.data.columns:
-            if type(self.data[col][0]) != str:
-                columns.append(col)
-        # Makes variables for the axes
-        self.x_axis = tk.StringVar()
-        self.x_axis.set(columns[0])
-        self.y_axis = tk.StringVar()
-        self.y_axis.set(columns[0])
-
-        # Option menus for choosing the axes
-        ttk.OptionMenu(self.right_frame, self.x_axis, self.x_axis.get(), *columns).grid(row=11, column=1, sticky='ew')
-
-        ttk.OptionMenu(self.right_frame, self.y_axis, self.y_axis.get(), *columns).grid(row=6, column=1, sticky='ew')
 
         # Choose between scatter and line
         self.types = ["Scatter", "Line"]
@@ -155,18 +127,211 @@ class MainApp(tk.Tk):
         ttk.OptionMenu(self.right_frame, self.type, self.type.get(), *self.types).grid(row=1, column=1, columnspan=2, sticky="ew")
         self.type.trace('w', self.update_axes)
 
+
+
+
+        # add another plot
+        self.next_line = 18
+        self.addbtn = ttk.Button(self.right_frame, text='+', command=self.new_data)
+        self.addbtn.grid(row=self.next_line, column=0, columnspan=3, sticky='ew')
+
+
+        # Creating data structures
+        self.plot_titles=[]
+        self.plot_number=0
+        self.x_labels=[]
+        self.x_data=[]
+        self.x_list=[]
+        self.y_labels=[]
+        self.y_data=[]
+        self.y_list=[]
+        self.files={}
+        self.file = tk.StringVar()
+        self.file.set('Select file')
+        self.file_lists=[]
+        self.file_labels=[]
+        self.columns=[]
+        self.options=[]
+        self.x_axis = tk.StringVar()
+        self.y_axis = tk.StringVar()
+
+
+        self.update_titles()
+        self.update_lims()
+
+
+
+
+
+
+
+    def new_data(self):
+
+    ### additional plotting information ###
+
+
+        # X axis
+
+        self.next_xlabel = ttk.Label(self.right_frame, text="x-axis:", anchor="c")
+        self.next_xlabel.grid(row=self.next_line+4, column=0, columnspan=3, sticky="ew")
+        self.next_xdata = ttk.Label(self.right_frame, text="Data:", anchor="e")
+        self.next_xdata.grid(row=self.next_line+5, column=0, sticky="ew")
+
+        self.x_labels.append(self.next_xlabel)
+        self.x_data.append(self.next_xdata)
+
+        self.x_axis.set('Select Data')
+        self.next_xlist=ttk.OptionMenu(self.right_frame, self.x_axis, self.x_axis.get(), *self.columns)
+        self.next_xlist.grid(row=self.next_line+5, column=1, sticky='ew')
+        self.x_list.append(self.next_xlist)
+
+
+
+        # Y axis
+        self.next_ylabel = ttk.Label(self.right_frame, text="y-axis:", anchor="c")
+        self.next_ylabel.grid(row=self.next_line+2, column=0, columnspan=3,sticky="ew")
+        self.next_ydata = ttk.Label(self.right_frame, text="Data:", anchor="e")
+        self.next_ydata.grid(row=self.next_line+3, column=0, sticky="ew")
+
+        self.y_labels.append(self.next_ylabel)
+        self.y_data.append(self.next_ydata)
+
+        self.y_axis.set('Select Data')
+        self.next_ylist=ttk.OptionMenu(self.right_frame, self.y_axis, self.y_axis.get(), *self.columns)
+        self.next_ylist.grid(row=self.next_line+3, column=1, sticky='ew')
+        self.y_list.append(self.next_ylist)
+
+
+
+        # File list
+        self.next_filelabel=ttk.Label(self.right_frame, text='Choose file:', anchor='e')
+        self.next_filelabel.grid(row=self.next_line+1, column=0, sticky='ew')
+        self.next_filelist=ttk.OptionMenu(self.right_frame, self.file, self.file.get(), *self.options)
+        self.next_filelist.grid(row=self.next_line+1, column=1, sticky='ew')
+        self.file_lists.append(self.next_filelist)
+        self.file_labels.append(self.next_filelabel)
+
+        #title
+        self.plot_number+=1
+        self.next_title = ttk.Label(self.right_frame, text='Plot #%d'%self.plot_number, anchor='c')
+        self.next_title.grid(row=self.next_line, column=0, columnspan=3, sticky='ew')
+
+        self.plot_titles.append(self.next_title)
+
+        try:
+            self.subbtn.destroy()
+        except Exception:
+            pass
+
+        self.next_line = self.next_line + 8
+        self.addbtn.grid(row=self.next_line, column=1, columnspan=1, sticky='ew')
+        self.subbtn = ttk.Button(self.right_frame, text='-', command=self.less_data)
+        self.subbtn.grid(row=self.next_line, column=2, columnspan=1, sticky='ew')
+
+    def less_data(self):
+
+        # Remove
+        try:
+            self.x_labels[len(self.x_labels)-1].destroy()
+            self.x_labels.pop()
+            self.x_data[len(self.x_data)-1].destroy()
+            self.x_data.pop()
+            self.y_labels[len(self.y_labels)-1].destroy()
+            self.y_labels.pop()
+            self.y_data[len(self.y_data)-1].destroy()
+            self.y_data.pop()
+            self.plot_titles[len(self.plot_titles)-1].destroy()
+            self.plot_titles.pop()
+            self.x_list[len(self.x_list)-1].destroy()
+            self.x_list.pop()
+            self.y_list[len(self.y_list)-1].destroy()
+            self.y_list.pop()
+            self.file_lists[len(self.file_lists)-1].destroy()
+            self.file_lists.pop()
+            self.file_labels[len(self.file_labels)-1].destroy()
+            self.file_labels.pop()
+            self.plot_number-=1
+        except Exception:
+            pass
+        if len(self.x_labels)==0:
+            self.subbtn.destroy()
+            self.addbtn.grid(row=self.next_line, column=0, columnspan=3, sticky='ew')
+
+
+
+
+
+
+    def new_file(self):
+        directory = filedialog.askopenfile(initialdir=os.path.expanduser('~/Desktop/CPMI/Lithium_Wetting/GF-Wetting/304SS'))
+        self.files[os.path.basename(directory.name)]=pd.read_csv(directory)
+
+        #option menu for files
+        self.options = list(self.files.keys())
+
+        try:
+            menu = self.file_lists[0]["menu"]
+            menu.delete(0, "end")
+            for string in self.options:
+                menu.add_command(label=string,
+                                 command=lambda value=string: self.file.set(value))
+        except Exception:
+            pass
+
+        #ttk.OptionMenu(self.right_frame, self.file, self.file.get(), *self.options).grid(row=0, column=1, sticky='ew')
+        self.file.trace('w', self.choose_axes)
         self.x_axis.trace('w', self.update_axes)
         self.x_axis.trace('w', self.set_xlabel)
         self.y_axis.trace('w', self.update_axes)
         self.y_axis.trace('w', self.set_ylabel)
 
+
+    #def add_axes(self):
+
+
+
+
+
+
+    def choose_axes(self, *args):
+
+        # choose axes
+        print(self.options[0])
+        self.columns=[]
+        try:
+            for col in self.files[self.file.get()].columns:
+                if type(self.files[self.file.get()][col][0]) != str:
+                    self.columns.append(col)
+        except Exception:
+            print(3)
+        print(self.columns)
+
+        menu = self.x_list[0]["menu"]
+        menu.delete(0, "end")
+        for string in self.columns:
+            menu.add_command(label=string,
+                             command=lambda value=string: self.x_axis.set(value))
+        # Makes variables for the axes
+
+        # Option menus for choosing the axes
+        #self.x_list=ttk.OptionMenu(self.right_frame, self.x_axis, self.x_axis.get(), *columns)
+
+        #self.y_list=ttk.OptionMenu(self.right_frame, self.y_axis, self.y_axis.get(), *columns)
+
+
+        menu = self.y_list[0]["menu"]
+        menu.delete(0, "end")
+        for string in self.columns:
+            menu.add_command(label=string,
+                             command=lambda value=string: self.y_axis.set(value))
+
     def set_xlabel(self, *args):
         self.x_title.set(self.x_axis.get())
-        self.update_titles
+        self.update_titles()
 
     def set_ylabel(self, *args):
         self.y_title.set(self.y_axis.get())
-        self.update_titles
+        self.update_titles()
 
     def update_titles(self, *args):
         plt.title(self.title1.get())
@@ -174,23 +339,36 @@ class MainApp(tk.Tk):
         plt.ylabel(self.y_title.get())
         self.canvas.draw()
 
-    def update_axes(self, *args):
-        self.ax.clear()
-        if self.type.get() == "Line":
-            self.ax.plot(self.data[self.x_axis.get()], self.data[self.y_axis.get()])
-        elif self.type.get() == "Scatter":
-            self.ax.scatter(self.data[self.x_axis.get()], self.data[self.y_axis.get()])
-        minx = min(self.data[self.x_axis.get()])
-        maxx = max(self.data[self.x_axis.get()])
-        self.xlow.set(minx -.1*(maxx-minx))
-        self.xup.set(maxx+.1*(maxx-minx))
 
-        miny = min(self.data[self.y_axis.get()])
-        maxy = max(self.data[self.y_axis.get()])
-        self.ylow.set(0)
-        self.yup.set(maxy + .1*(maxy-miny))
-        self.update_lims()
-        self.update_titles()
+    def update_axes(self, *args):
+
+
+
+        self.ax.clear()
+
+        try:
+            if self.type.get() == "Line":
+                self.ax.plot(self.files[self.file.get()][self.x_axis.get()], self.files[self.file.get()][self.y_axis.get()])
+            elif self.type.get() == "Scatter":
+                self.ax.scatter(self.files[self.file.get()][self.x_axis.get()], self.files[self.file.get()][self.y_axis.get()])
+            minx = min(self.files[self.file.get()][self.x_axis.get()])
+            maxx = max(self.files[self.file.get()][self.x_axis.get()])
+            self.xlow.set(minx -.1*(maxx-minx))
+            self.xup.set(maxx+.1*(maxx-minx))
+
+            miny = min(self.files[self.file.get()][self.y_axis.get()])
+            maxy = max(self.files[self.file.get()][self.y_axis.get()])
+            self.ylow.set(0)
+            self.yup.set(maxy + .1*(maxy-miny))
+            self.update_lims()
+            self.update_titles()
+            print(2)
+        except Exception:
+            print(1)
+
+
+
+
 
     def update_lims(self, *args):
         self.ax.set_xlim(float(self.xlow.get()), float(self.xup.get()))
@@ -261,6 +439,11 @@ class MainApp(tk.Tk):
         '''
         self.quit()
         self.destroy()
+
+class line():
+    def __init__(self):
+        pass
+
 
 
 if __name__ == '__main__':
