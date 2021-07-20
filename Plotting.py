@@ -440,6 +440,12 @@ class MainApp(tk.Tk):
         self.quit()
         self.destroy()
 
+class line():
+    def __init__(self):
+        pass
+    def
+
+
 
 if __name__ == '__main__':
     app = MainApp()
